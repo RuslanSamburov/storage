@@ -15,28 +15,28 @@ class Request
         return $_POST[$field] ?? null;
     }
 
-    public static function check_method(string $method): bool
+    public static function checkMethod(string $method): bool
     {
         return $_SERVER['REQUEST_METHOD'] == $method ? true : self::post('_method') == $method;
     }
 
-    public static function is_get(): bool
+    public static function isGet(): bool
     {
-        return self::check_method('GET');
+        return self::checkMethod('GET');
     }
 
-    public static function is_post(): bool
+    public static function isPost(): bool
     {
-        return self::check_method('POST') && !isset($_POST['_method']);
+        return self::checkMethod('POST') && !isset($_POST['_method']);
     }
 
-    public static function is_delete(): bool
+    public static function isDelete(): bool
     {
-        return self::check_method('DELETE');
+        return self::checkMethod('DELETE');
     }
 
-    public static function is_put(): bool
+    public static function isPut(): bool
     {
-        return self::check_method('PUT');
+        return self::checkMethod('PUT');
     }
 }

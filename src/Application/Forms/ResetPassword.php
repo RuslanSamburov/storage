@@ -2,10 +2,11 @@
 
 namespace Storage\Storage\Application\Forms;
 
-use Storage\Storage\Core\Form;
-
-use Storage\Storage\Core\Account;
-use Storage\Storage\Core\Password;
+use Storage\Storage\Core\{
+    Form,
+    Account,
+    Password,
+};
 
 class ResetPassword extends Form
 {
@@ -23,8 +24,11 @@ class ResetPassword extends Form
         ],
     ];
 
-    public static function after_normalize_data(array &$data, array &$errors, array &$results): void
-    {
+    public static function afterNormalizeData(
+        array &$data,
+        array &$errors,
+        array &$results,
+    ): void {
         $user = Account::getUser(Account::getCurrentUser(), 'id', 'password');
         if (!Password::checkLength($data['password'])) {
             $errors['password'] = 'Длина пароля должна быть более 8-и символов';
@@ -45,7 +49,7 @@ class ResetPassword extends Form
         }
     }
 
-    protected static function after_prepare_data(array &$data, array &$norm_data): void
+    protected static function afterPrepareData(array &$data, array &$norm_data): void
     {
         $data['password'] = Password::passwordHash($norm_data['password2']);
     }

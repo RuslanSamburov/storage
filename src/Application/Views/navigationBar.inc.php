@@ -1,7 +1,6 @@
 <?php
 
-use Storage\Storage\Core\Math;
-use Storage\Storage\Core\Storage;
+use Storage\Storage\Core\{Math, Storage};
 
 ?>
 

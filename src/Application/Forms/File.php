@@ -2,13 +2,15 @@
 
 namespace Storage\Storage\Application\Forms;
 
-use Storage\Storage\Core\Storage;
-use Storage\Storage\Core\Form;
+use Storage\Storage\Core\{Storage, Form};
 
 class File extends Form
 {
-    protected static function after_normalize_data(array &$data, array &$errors, &$results): void
-    {
+    protected static function afterNormalizeData(
+        array &$data,
+        array &$errors,
+        &$results,
+    ): void {
         $file = $_FILES['file'];
         $error = $file['error'];
         if ($error == UPLOAD_ERR_NO_FILE) {

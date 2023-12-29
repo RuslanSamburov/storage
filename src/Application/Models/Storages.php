@@ -2,10 +2,12 @@
 
 namespace Storage\Storage\Application\Models;
 
-use Storage\Storage\Core\Helpers;
-use Storage\Storage\Core\Account;
-use Storage\Storage\Core\Model;
-use Storage\Storage\Core\Storage;
+use Storage\Storage\Core\{
+    Account,
+    Arrays,
+    Model,
+    Storage,
+};
 
 class Storages extends Model
 {
@@ -19,21 +21,21 @@ class Storages extends Model
         'type_storage' => [
             'primary' => 'id',
             'external' => 'type',
-        ]
+        ],
     ];
 
-    protected function before_insert(array &$fields): void
+    protected function beforeInsert(array &$fields): void
     {
         $file = $_FILES['file'];
         $name = Storage::generateName();
-        $filename = Storage::get_filename($file['name']);
+        $filename = Storage::getFilename($file['name']);
         $fields['user_id'] = Account::getCurrentUser();
         $fields['name'] = $name;
         $fields['file'] = $filename;
         Storage::upload($file, $filename);
     }
 
-    protected function before_delete(string $value, string $key_field = 'id'): void
+    protected function beforeDelete(string $value, string $key_field = 'id'): void
     {
         $storage = Storage::getStorage($value, 'name');
         if (!$storage) {
@@ -42,16 +44,15 @@ class Storages extends Model
         Storage::delete($storage['file']);
     }
 
-    protected function before_update(
+    protected function beforeUpdate(
         array &$fields,
         string $value,
         string $key_field = 'id'
     ): void {
         $storage = Storage::getStorage($value, 'name');
         $typesStorage = new TypesStorage();
-        $types = $typesStorage->get_all('id');
-        $type = Helpers::array_find('id', ++$storage['type'], $types);
-        print_r($types);
+        $types = $typesStorage->getAll('id');
+        $type = Arrays::arrayFind('id', ++$storage['type'], $types);
         if (!$type) {
             $type = $types[0]['id'];
         } else {

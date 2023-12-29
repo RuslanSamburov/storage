@@ -2,23 +2,20 @@
 
 namespace Storage\Storage\Core;
 
-use Storage\Storage\AbstractEntities\Controller;
+use Storage\Storage\Application\Models\{Users, Profiles};
 
-use Storage\Storage\Application\Models\Users;
 use Storage\Storage\Core\Account;
 
-use Storage\Storage\Application\Models\Profiles;
-
-class BaseController extends Controller
+class BaseController
 {
-    private $current_user = null;
-    private $current_profile = null;
+    private $currentUser = null;
+    private $currentProfile = null;
 
     private static function renderView(string $template, array $context): void
     {
-        global $base_path;
+        global $basePath;
         extract($context);
-        require_once $base_path . '/src/Application/Views/' . $template . '.php';
+        require_once $basePath . '/src/Application/Views/' . $template . '.php';
     }
 
     public function __construct() 
@@ -26,34 +23,34 @@ class BaseController extends Controller
         if(session_status() != PHP_SESSION_ACTIVE) {
             session_start();
         }
-        $user_id = Account::getCurrentUser();
-        if ($user_id) {
+        $userId = Account::getCurrentUser();
+        if ($userId) {
             $users = new Users();
-            $user = $users->get($user_id);
+            $user = $users->get($userId);
             if(!$user) {
                 Account::logout();
                 return;
             }
             $profiles = new Profiles();
-            $profile = $profiles->get($user_id, 'user_id');
+            $profile = $profiles->get($userId, 'user_id');
             if(!$profile) {
-                $profiles->insert(['user_id' => $user_id]);
-                $profile = $profiles->get($user_id, 'user_id');
+                $profiles->insert(['user_id' => $userId]);
+                $profile = $profiles->get($userId, 'user_id');
             }
-            $this->current_user = $user;
-            $this->current_profile = $profile;
+            $this->currentUser = $user;
+            $this->currentProfile = $profile;
         }
     }
     
-    protected function context_append(array &$context): void
+    protected function contextAppend(array &$context): void
     {
-        $context['__current_user'] = $this->current_user;
-        $context['__current_profile'] = $this->current_profile;
+        $context['__current_user'] = $this->currentUser;
+        $context['__current_profile'] = $this->currentProfile;
     }
 
     protected function render(string $template, array $context = []): void
     {
-        $this->context_append($context);
+        $this->contextAppend($context);
 
         self::renderView($template, $context);
     }

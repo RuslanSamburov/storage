@@ -2,16 +2,15 @@
 
 namespace Storage\Storage\Application\Controllers;
 
-use Storage\Storage\Core\BaseController;
-use Storage\Storage\Core\Account;
-use Storage\Storage\Core\Request;
-
-use Storage\Storage\Application\Forms\Register;
-use Storage\Storage\Application\Forms\Login as LoginForm;
-
+use Storage\Storage\Core\{
+    BaseController,
+    Account,
+    Request,
+    Auth,
+    Response,
+};
+use Storage\Storage\Application\Forms\{Register, Login as LoginForm};
 use Storage\Storage\Application\Models\Users;
-use Storage\Storage\Core\Auth;
-use Storage\Storage\Core\Response;
 
 class Login extends BaseController
 {
@@ -23,20 +22,20 @@ class Login extends BaseController
             return;
         }
 
-        if (Request::is_post()) {
-            $formLogin = LoginForm::get_normalized_data($_POST);
+        if (Request::isPost()) {
+            $formLogin = LoginForm::getNormalizedData($_POST);
             if (!isset($formLogin['__errors'])) {
-                $formLogin = LoginForm::get_prepared_data($formLogin);
-                $user_id = LoginForm::verify_user($formLogin);
+                $formLogin = LoginForm::getPreparedData($formLogin);
+                $user_id = LoginForm::verifyUser($formLogin);
                 if ($user_id) {
                     Account::setUser($user_id);
-                    if (Auth::is_user_active()) {
+                    if (Auth::isUserActive()) {
                         Response::redirect('/');
                     }
                 }
             }
         } else {
-            $formLogin = LoginForm::get_initial_data([]);
+            $formLogin = LoginForm::getInitialData([]);
         }
         $ctx = [
             'form' => $formLogin,
@@ -51,10 +50,10 @@ class Login extends BaseController
             return;
         }
 
-        if (Request::is_post()) {
-            $formRegister = Register::get_normalized_data($_POST);
+        if (Request::isPost()) {
+            $formRegister = Register::getNormalizedData($_POST);
             if (!isset($formRegister['__errors'])) {
-                $formRegister = Register::get_prepared_data($formRegister);
+                $formRegister = Register::getPreparedData($formRegister);
                 $users = new Users();
                 $id = $users->insert($formRegister);
                 Account::setUser($id);
@@ -63,7 +62,7 @@ class Login extends BaseController
                 return;
             }
         } else {
-            $formRegister = Register::get_initial_data([]);
+            $formRegister = Register::getInitialData([]);
         }
         $ctx = [
             'form' => $formRegister,
@@ -83,12 +82,12 @@ class Login extends BaseController
 
     public function activation(): void
     {
-        if (!Auth::auth_no_active()) {
+        if (!Auth::authNoActive()) {
             Response::redirect('/login');
             return;
         }
 
-        if (Request::is_put()) {
+        if (Request::isPut()) {
             $user = Account::getUser(Account::getCurrentUser());
             Account::activationSend($user['email'], $user['id'], $user['token']);
             Response::redirect('/activation');
@@ -99,7 +98,7 @@ class Login extends BaseController
 
     public function activationUser(int $id, string $token): void
     {
-        if (!Auth::auth_no_active()) {
+        if (!Auth::authNoActive()) {
             Response::redirect('/login');
             return;
         }

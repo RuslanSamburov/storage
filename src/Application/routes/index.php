@@ -1,9 +1,9 @@
 <?php
 
-$request_path = $_GET['route'];
+$requestPath = $_GET['route'];
 
-if ($request_path && $request_path[-1] == '/') {
-    $request_path = substr($request_path, 0, strlen($request_path) - 1);
+if ($requestPath && $requestPath[-1] == '/') {
+    $requestPath = substr($requestPath, 0, strlen($requestPath) - 1);
 }
 
 $result = [];

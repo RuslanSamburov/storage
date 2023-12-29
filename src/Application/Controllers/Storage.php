@@ -2,19 +2,22 @@
 
 namespace Storage\Storage\Application\Controllers;
 
-use Storage\Storage\Application\Forms\DeleteFile;
-use Storage\Storage\Application\Forms\File;
-use Storage\Storage\Application\Forms\PutFile;
-use Storage\Storage\Application\Forms\ResetPassword;
-use Storage\Storage\Application\Models\Storages;
-use Storage\Storage\Application\Models\Users;
+use Storage\Storage\Application\Forms\{
+    DeleteFile,
+    File,
+    PutFile,
+    ResetPassword,
+};
+use Storage\Storage\Application\Models\{Storages, Users};
 use Storage\Storage\Application\Settings;
-use Storage\Storage\Core\BaseController;
-use Storage\Storage\Core\Account;
-use Storage\Storage\Core\Auth;
-use Storage\Storage\Core\Request;
-use Storage\Storage\Core\Response;
-use Storage\Storage\Core\Storage as CoreStorage;
+use Storage\Storage\Core\{
+    BaseController,
+    Account,
+    Auth,
+    Request,
+    Response,
+    Storage as CoreStorage,
+};
 
 class Storage extends BaseController
 {
@@ -25,9 +28,9 @@ class Storage extends BaseController
             return;
         }
 
-        $file = File::get_initial_data();
-        if (Request::is_post()) {
-            $file = File::get_normalized_data();
+        $file = File::getInitialData();
+        if (Request::isPost()) {
+            $file = File::getNormalizedData();
             if (!isset($file['__errors'])) {
                 $storages = new Storages();
                 $storages->insert();
@@ -36,10 +39,10 @@ class Storage extends BaseController
             }
         }
 
-        if (Request::is_delete()) {
-            $file = DeleteFile::get_normalized_data($_POST);
+        if (Request::isDelete()) {
+            $file = DeleteFile::getNormalizedData($_POST);
             if (!isset($file['__errors'])) {
-                $file = DeleteFile::get_prepared_data($file);
+                $file = DeleteFile::getPreparedData($file);
                 $storages = new Storages();
                 $storages->delete(Request::post('filename'), 'name');
                 Response::redirect('/');
@@ -47,10 +50,10 @@ class Storage extends BaseController
             }
         }
 
-        if (Request::is_put()) {
-            $file = PutFile::get_normalized_data($_POST);
+        if (Request::isPut()) {
+            $file = PutFile::getNormalizedData($_POST);
             if (!isset($file['__errors'])) {
-                $file = DeleteFile::get_prepared_data($file);
+                $file = DeleteFile::getPreparedData($file);
                 $storages = new Storages();
                 $storages->update([], $file['filename'], 'name');
                 Response::redirect('/');
@@ -58,8 +61,11 @@ class Storage extends BaseController
             }
         }
 
+        $files = CoreStorage::getStorageFiles();
+
         $ctx = [
             'file' => $file,
+            'files' => $files,
         ];
 
         $this->render('index', $ctx);
@@ -72,15 +78,15 @@ class Storage extends BaseController
             return;
         }
 
-        if (Request::is_put()) {
-            $formResetPassword = ResetPassword::get_normalized_data($_POST);
+        if (Request::isPut()) {
+            $formResetPassword = ResetPassword::getNormalizedData($_POST);
             if (!isset($formResetPassword['__errors'])) {
-                $update = ResetPassword::get_prepared_data($formResetPassword);
+                $update = ResetPassword::getPreparedData($formResetPassword);
                 $users = new Users();
                 $users->update($update, Account::getCurrentUser());
             }
         } else {
-            $formResetPassword = ResetPassword::get_initial_data();
+            $formResetPassword = ResetPassword::getInitialData();
         }
 
         $ctx = [
@@ -93,15 +99,15 @@ class Storage extends BaseController
     public function download(string $name): void
     {
         $filestorage = CoreStorage::getStorage($name, 'name');
-        $user_id = $filestorage['user_id'] ?? null;
+        $userId = $filestorage['user_id'] ?? null;
         if (
-            !$user_id
-            || ($filestorage['type'] == Settings::TYPES_STORAGE_PRIVATE && $user_id != Account::getCurrentUser())
-            || $filestorage['type'] != Settings::TYPES_STORAGE_PUBLIC
+            !$userId
+            || $filestorage['type'] == Settings::TYPES_STORAGE_CLOSE
+            || ($filestorage['type'] == Settings::TYPES_STORAGE_PRIVATE && Account::getCurrentUser() != $userId)
         ) {
             Response::redirect('/');
             return;
         }
-        CoreStorage::download($user_id, $filestorage['file']);
+        CoreStorage::download($userId, $filestorage['file']);
     }
 }

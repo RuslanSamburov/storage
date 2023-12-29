@@ -11,13 +11,13 @@ class Model implements \Iterator
     protected const DEFAULT_ORDER = false;
     protected const RELATIONS = [];
 
-    private static $connection = false;
-    private static $connection_count = 0;
+    private static PDO|false $connection = false;
+    private static int $connectionCount = 0;
 
     private $query = null;
     private $result = false;
 
-    public static function connect_to_db(): PDO
+    public static function connectToDb(): PDO
     {
         $conn_str = 'mysql:host=' . Settings::DB_HOST . ';dbname=' . Settings::DB_NAME . ';charset=utf8';
         return new PDO($conn_str, Settings::DB_USER, Settings::DB_PASSWORD);
@@ -26,15 +26,15 @@ class Model implements \Iterator
     public function __construct()
     {
         if (!self::$connection) {
-            self::$connection = self::connect_to_db();
+            self::$connection = self::connectToDb();
         }
-        self::$connection_count++;
+        self::$connectionCount++;
     }
 
     public function __destruct()
     {
-        self::$connection_count--;
-        if (self::$connection_count == 0) {
+        self::$connectionCount--;
+        if (self::$connectionCount == 0) {
             self::$connection = false;
         }
     }
@@ -60,6 +60,7 @@ class Model implements \Iterator
                         break;
                     default:
                         $t = PDO::PARAM_STR;
+                        break;
                 }
                 $this->query->bindValue($k, $value, $t);
             }
@@ -80,16 +81,16 @@ class Model implements \Iterator
     ): void {
         $sql = 'SELECT ' . $fields . ' FROM ' . static::TABLE_NAME;
         if ($links) {
-            foreach ($links as $ext_table) {
-                $rel = static::RELATIONS[$ext_table];
+            foreach ($links as $extTable) {
+                $rel = static::RELATIONS[$extTable];
                 $sql .= ' ' . ((key_exists('type', $rel)) ?
                     $rel['type'] : 'INNER')
                     . ' JOIN '
-                    . $ext_table
+                    . $extTable
                     . ' ON '
                     . static::TABLE_NAME . '.' . $rel['external']
                     . ' = '
-                    . $ext_table . '.' . $rel['primary'];
+                    . $extTable . '.' . $rel['primary'];
             }
         }
         if ($where) {
@@ -103,7 +104,7 @@ class Model implements \Iterator
         }
         if ($order) {
             $sql .= ' ORDER BY ' . $order;
-        } else if(static::DEFAULT_ORDER) {
+        } elseif(static::DEFAULT_ORDER) {
             $sql .= ' ORDER BY ' . static::DEFAULT_ORDER;
         }
         if ($offset && $limit) {
@@ -138,7 +139,7 @@ class Model implements \Iterator
         return !empty($this->result);
     }
 
-    public function get_record(
+    public function getRecord(
         string $fields = '*',
         array $links = [],
         string $where = '',
@@ -151,25 +152,25 @@ class Model implements \Iterator
 
     public function get(
         string $value,
-        string $key_field = 'id',
+        string $keyField = 'id',
         string $fields = '*',
         array $links = [],
     ): array|bool {
-        return $this->get_record(
+        return $this->getRecord(
             $fields,
             $links,
-            $key_field . ' = ?',
+            $keyField . ' = ?',
             [$value]
         );
     }
 
-    protected function before_insert(array &$fields): void
+    protected function beforeInsert(array &$fields): void
     {
     }
 
-    function insert(array $fields = []): int
+    public function insert(array $fields = []): int
     {
-        static::before_insert($fields);
+        static::beforeInsert($fields);
         $sql = 'INSERT INTO ' . static::TABLE_NAME;
         $sql2 = $sql1 = '';
         foreach ($fields as $n => $value) {
@@ -186,16 +187,16 @@ class Model implements \Iterator
         return $id;
     }
 
-    protected function before_update(
+    protected function beforeUpdate(
         array &$fields,
         string $value,
-        string $key_field = 'id'
+        string $keyField = 'id'
     ): void {
     }
 
-    public function update(array $fields, string $value, string $key_field = 'id'): void
+    public function update(array $fields, string $value, string $keyField = 'id'): void
     {
-        static::before_update($fields, $value, $key_field);
+        static::beforeUpdate($fields, $value, $keyField);
         $sql = 'UPDATE ' . static::TABLE_NAME . ' SET ';
         $sql1 = '';
         foreach ($fields as $n => $v) {
@@ -204,24 +205,24 @@ class Model implements \Iterator
             }
             $sql1 .= $n . ' = :' . $n;
         }
-        $sql .= $sql1 . ' WHERE ' . $key_field . ' = :__key;';
+        $sql .= $sql1 . ' WHERE ' . $keyField . ' = :__key;';
         $fields['__key'] = $value;
         $this->run($sql, $fields);
     }
 
-    protected function before_delete(string $value, string $key_field = 'id')
+    protected function beforeDelete(string $value, string $keyField = 'id')
     {
     }
 
-    function delete(string $value, string $key_field = 'id')
+    public function delete(string $value, string $keyField = 'id')
     {
-        static::before_delete($value, $key_field);
+        static::beforeDelete($value, $keyField);
         $sql = 'DELETE FROM ' . static::TABLE_NAME;
-        $sql .= ' WHERE ' . $key_field . ' = ?;';
+        $sql .= ' WHERE ' . $keyField . ' = ?;';
         $this->run($sql, [$value]);
     }
 
-    function get_all(
+    public function getAll(
         string $fields = '*',
         array $links = [],
         string $where = '',

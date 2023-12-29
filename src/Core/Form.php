@@ -6,108 +6,112 @@ class Form
 {
     protected const FIELDS = [];
 
-    private static function get_initial_value(
-        string $fld_name,
-        array $fld_params,
+    private static function getInitialValue(
+        string $fldName,
+        array $fldParams,
         array $initial = [],
     ): string {
-        if (isset($initial[$fld_name])) {
-            $val = $initial[$fld_name];
-        } else if (isset($fld_params['initial'])) {
-            $val = $fld_params['initial'];
+        if (isset($initial[$fldName])) {
+            $val = $initial[$fldName];
+        } elseif (isset($fldParams['initial'])) {
+            $val = $fldParams['initial'];
         } else {
             $val = '';
         }
         return $val;
     }
 
-    protected static function after_initialize_data(array &$data): void
+    protected static function afterInitializeData(array &$data): void
     {
     }
 
-    public static function get_initial_data(array $initial = []): array
+    public static function getInitialData(array $initial = []): array
     {
         $data = [];
-        foreach (static::FIELDS as $fld_name => $fld_params) {
-            $data[$fld_name] = self::get_initial_value(
-                $fld_name,
-                $fld_params,
+        foreach (static::FIELDS as $fldName => $fldParams) {
+            $data[$fldName] = self::getInitialValue(
+                $fldName,
+                $fldParams,
                 $initial,
             );
         }
-        static::after_initialize_data($data);
+        static::afterInitializeData($data);
         return $data;
     }
 
-    protected static function after_normalize_data(array &$data, array &$errors, array &$results): void
-    {
+    protected static function afterNormalizeData(
+        array &$data,
+        array &$errors,
+        array &$results,
+    ): void {
     }
 
-    public static function get_normalized_data(array $form_data = null): array
+    public static function getNormalizedData(array $formData = null): array
     {
         $data = [];
         $errors = [];
         $results = [];
-        foreach (static::FIELDS as $fld_name => $fld_params) {
-            $fld_type = (isset($fld_params['type'])) ?
-                $fld_params['type'] : 'string';
-            if ($fld_type == 'boolean') {
-                $data[$fld_name] = !empty($form_data[$fld_name]);
+        foreach (static::FIELDS as $fldName => $fldParams) {
+            $fldType = (isset($fldParams['type'])) ?
+                $fldParams['type'] : 'string';
+            if ($fldType == 'boolean') {
+                $data[$fldName] = !empty($formData[$fldName]);
             } else {
-                if (empty($form_data[$fld_name])) {
-                    $data[$fld_name] = self::get_initial_value($fld_name, $fld_params);
-                    if (!isset($fld_params['optional'])) {
-                        $errors[$fld_name] = 'Заполните поле';
+                if (empty($formData[$fldName])) {
+                    $data[$fldName] = self::getInitialValue($fldName, $fldParams);
+                    if (!isset($fldParams['optional'])) {
+                        $errors[$fldName] = 'Заполните поле';
                     }
                 } else {
-                    $fld_value = $form_data[$fld_name];
-                    switch ($fld_type) {
+                    $fldValue = $formData[$fldName];
+                    switch ($fldType) {
                         case 'integer':
                             $v = filter_var(
-                                $fld_value,
+                                $fldValue,
                                 FILTER_SANITIZE_NUMBER_INT,
                             );
                             if ($v) {
-                                $data[$fld_name] = $v;
+                                $data[$fldName] = $v;
                             } else {
-                                $errors[$fld_name] = 'Введите целое число';
+                                $errors[$fldName] = 'Введите целое число';
                             }
                             break;
                         case 'float':
                             $v = filter_var(
-                                $fld_value,
+                                $fldValue,
                                 FILTER_SANITIZE_NUMBER_FLOAT,
                                 ['flags' => FILTER_FLAG_ALLOW_FRACTION],
                             );
                             if ($v) {
-                                $data[$fld_name] = $v;
+                                $data[$fldName] = $v;
                             } else {
-                                $errors[$fld_name] = 'Введите вещественное число';
+                                $errors[$fldName] = 'Введите вещественное число';
                             }
                             break;
                         case 'email':
                             $v = filter_var(
-                                $fld_value,
+                                $fldValue,
                                 FILTER_SANITIZE_EMAIL,
                             );
                             if ($v) {
-                                $data[$fld_name] = $v;
+                                $data[$fldName] = $v;
                             } else {
-                                $errors[$fld_name] = 'Введите адрес электронной почты';
+                                $errors[$fldName] = 'Введите адрес электронной почты';
                             }
                             break;
                         default:
-                            $data[$fld_name] = filter_var(
-                                $fld_value,
+                            $data[$fldName] = filter_var(
+                                $fldValue,
                                 FILTER_SANITIZE_STRING,
                             );
+                            break;
                     }
                 }
             }
         }
 
         if (!$errors) {
-            static::after_normalize_data($data, $errors, $results);
+            static::afterNormalizeData($data, $errors, $results);
         }
 
         if ($errors) {
@@ -119,22 +123,22 @@ class Form
         return $data;
     }
 
-    protected static function after_prepare_data(array &$data, array &$norm_data): void
+    protected static function afterPrepareData(array &$data, array &$normData): void
     {
     }
 
-    public static function get_prepared_data(array $norm_data): array
+    public static function getPreparedData(array $normData): array
     {
         $data = [];
-        foreach (static::FIELDS as $fld_name => $fld_params) {
+        foreach (static::FIELDS as $fldName => $fldParams) {
             if (
-                !isset($fld_params['nosave']) &&
-                isset($norm_data[$fld_name])
+                !isset($fldParams['nosave']) &&
+                isset($normData[$fldName])
             ) {
-                $data[$fld_name] = $norm_data[$fld_name];
+                $data[$fldName] = $normData[$fldName];
             }
         }
-        static::after_prepare_data($data, $norm_data);
+        static::afterPrepareData($data, $normData);
         return $data;
     }
 }

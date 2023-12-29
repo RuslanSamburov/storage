@@ -5,7 +5,7 @@ use Storage\Storage\Exceptions\Page404NotFound;
 
 require_once 'vendor/autoload.php';
 
-$base_path = __DIR__ . DIRECTORY_SEPARATOR;
+$basePath = __DIR__ . DIRECTORY_SEPARATOR;
 
 function exception_handler(object $e): void
 {

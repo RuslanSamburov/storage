@@ -1,9 +1,6 @@
 <?php
 
-use Storage\Storage\Core\Helpers;
-use Storage\Storage\Core\Storage;
-
-$files = Storage::getStorageFiles();
+use Storage\Storage\Core\{Shows, Storage, Texts};
 
 ?>
 <!DOCTYPE html>
@@ -12,7 +9,7 @@ $files = Storage::getStorageFiles();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php require_once Helpers::get_fragment_path('css'); ?>
+    <?php require_once Texts::getFragmentPath('css'); ?>
     <title>Storage</title>
 </head>
 
@@ -20,7 +17,7 @@ $files = Storage::getStorageFiles();
     <div id="root">
         <div class="App">
             <div class="main">
-                <?php require_once Helpers::get_fragment_path('navigationBar'); ?>
+                <?php require_once Texts::getFragmentPath('navigationBar'); ?>
                 <div class="content">
                     <h1>Мои файлы</h1>
                     <div class="rendered-react-keyed-file-browser">
@@ -85,8 +82,8 @@ $files = Storage::getStorageFiles();
                             <p class="fileInputLabel" id="fileupload">Загрузить файл</p>
                         </div>
                     </div>
-                    <?php Helpers::show_errors('file', $file); ?>
-                    <?php Helpers::show_errors('filename', $file); ?>
+                    <?php Shows::showErrors('file', $file); ?>
+                    <?php Shows::showErrors('filename', $file); ?>
                 </div>
             </div>
         </div>

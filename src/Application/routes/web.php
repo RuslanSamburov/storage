@@ -1,32 +1,31 @@
 <?php
 
-use Storage\Storage\Application\Controllers\Storage;
-use Storage\Storage\Application\Controllers\Login;
+use Storage\Storage\Application\Controllers\{Storage, Login};
 
 use Storage\Storage\Exceptions\Page404NotFound;
 
-if ($request_path == '') {
+if ($requestPath == '') {
     $ctr = new Storage();
     $ctr->index();
-} else if ($request_path == 'password') {
+} elseif ($requestPath == 'password') {
     $ctr = new Storage();
     $ctr->password();
-} else if ($request_path == 'login') {
+} elseif ($requestPath == 'login') {
     $ctr = new Login();
     $ctr->login();
-} else if ($request_path == 'logout') {
+} elseif ($requestPath == 'logout') {
     $ctr = new Login();
     $ctr->logout();
-} else if ($request_path == 'register') {
+} elseif ($requestPath == 'register') {
     $ctr = new Login();
     $ctr->register();
-} else if ($request_path == 'activation') {
+} elseif ($requestPath == 'activation') {
     $ctr = new Login();
     $ctr->activation();
-} else if (preg_match('/activation\/(\d+)\/(.*)/', $request_path, $result)) {
+} elseif (preg_match('/activation\/(\d+)\/(.*)/', $requestPath, $result)) {
     $ctr = new Login();
     $ctr->activationUser($result[1], $result[2]);
-} else if (preg_match('/download\/(.*)/', $request_path, $result)) {
+} elseif (preg_match('/download\/(.*)/', $requestPath, $result)) {
     $ctr = new Storage();
     $ctr->download($result[1]);
 } else {

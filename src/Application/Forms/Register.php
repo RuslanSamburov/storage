@@ -2,12 +2,12 @@
 
 namespace Storage\Storage\Application\Forms;
 
-use Storage\Storage\Core\Form;
-
-use Storage\Storage\Core\Helpers;
-
+use Storage\Storage\Core\{
+    Form,
+    Password,
+    Texts,
+};
 use Storage\Storage\Application\Models\Users;
-use Storage\Storage\Core\Password;
 
 class Register extends Form
 {
@@ -24,8 +24,11 @@ class Register extends Form
         ],
     ];
 
-    protected static function after_normalize_data(array &$data, array &$errors, array &$results): void
-    {
+    protected static function afterNormalizeData(
+        array &$data,
+        array &$errors,
+        array &$results,
+    ): void {
         $users = new Users();
         $user = $users->get($data['email'], 'email', 'id');
         if (!preg_match('/[@]/', $data['email'])) {
@@ -45,9 +48,9 @@ class Register extends Form
         }
     }
 
-    protected static function after_prepare_data(array &$data, array &$norm_data): void
+    protected static function afterPrepareData(array &$data, array &$norm_data): void
     {
         $data['password'] = Password::passwordHash($norm_data['password2']);
-        $data['token'] = Helpers::generateSymbols();
+        $data['token'] = Texts::generateSymbols();
     }
 }

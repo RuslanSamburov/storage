@@ -6,14 +6,14 @@ use Storage\Storage\Application\Models\Users;
 
 class Auth
 {
-    public static function is_user_auth(): bool
+    public static function isUserAuth(): bool
     {
         return isset($_SESSION['current_user']) ? !empty($_SESSION['current_user']) : false;
     }
 
-    public static function is_user_active(): bool
+    public static function isUserActive(): bool
     {
-        if (!self::is_user_auth()) {
+        if (!self::isUserAuth()) {
             return false;
         }
         $users = new Users();
@@ -23,11 +23,11 @@ class Auth
 
     public static function auth(): bool
     {
-        return self::is_user_auth() && self::is_user_active();
+        return self::isUserAuth() && self::isUserActive();
     }
 
-    public static function auth_no_active(): bool
+    public static function authNoActive(): bool
     {
-        return self::is_user_auth() && !self::is_user_active();
+        return self::isUserAuth() && !self::isUserActive();
     }
 }

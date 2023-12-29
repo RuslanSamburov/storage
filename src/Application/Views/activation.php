@@ -1,6 +1,6 @@
 <?php
 
-use Storage\Storage\Core\Helpers;
+use Storage\Storage\Core\Texts;
 
 ?>
 
@@ -10,7 +10,7 @@ use Storage\Storage\Core\Helpers;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php require_once Helpers::get_fragment_path('css'); ?>
+    <?php require_once Texts::getFragmentPath('css'); ?>
     <link rel="stylesheet" href="css/activation.css">
     <title>Ативация аккаунта</title>
 </head>

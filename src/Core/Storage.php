@@ -3,22 +3,25 @@
 namespace Storage\Storage\Core;
 
 use Storage\Storage\Core\Helpers;
-use Storage\Storage\Application\Models\Profiles;
-use Storage\Storage\Application\Models\Storages;
-use Storage\Storage\Application\Models\TypesStorage;
+use Storage\Storage\Application\Models\{
+    Profiles,
+    Storages,
+    TypesStorage,
+};
 use Storage\Storage\Application\Settings;
 
 class Storage
 {
-    public static function getDirStorage(int $id = null): string
+    public static function getUserStorage(int $id = null): string
     {
-        global $base_path;
+        global $basePath;
         $id = $id ? $id : Account::getCurrentUser();
-        return $base_path . Settings::STORAGES . '/' . $id . '/';
+        return $basePath . Settings::STORAGES . '/' . $id . '/';
     }
 
-    public static function getFiles(string $folder, array &$result): void // Функция с модуля 7.5 :)
+    public static function getUserFiles(array &$result, int $id = null, string $next = null): void
     {
+        $folder = self::getUserStorage($id) . $next;
         if (!is_dir($folder)) {
             return;
         }
@@ -31,7 +34,7 @@ class Storage
             if (!is_dir($way)) {
                 $result[] = $way;
             } else {
-                self::getFiles($way, $result);
+                self::getUserFiles($result, $id, $way);
             }
         }
     }
@@ -40,7 +43,7 @@ class Storage
     {
         $result = [];
         $storages = new Storages();
-        $files = $storages->get_all(where: 'user_id = ?', params: [Account::getCurrentUser()]);
+        $files = $storages->getAll(where: 'user_id = ?', params: [Account::getCurrentUser()]);
         foreach ($files as $file) {
             $filename = $file['file'];
             $result[$filename] = [
@@ -69,7 +72,7 @@ class Storage
     {
         $searchResult = [];
 
-        self::getFiles(self::getDirStorage(), $searchResult);
+        self::getUserFiles($searchResult);
 
         $size = 0;
 
@@ -96,15 +99,19 @@ class Storage
         return $type;
     }
 
-    public static function getStorage(string $value, string $key_field = 'id', string $fields = '*', array $links = []): array|bool
-    {
+    public static function getStorage(
+        string $value,
+        string $keyField = 'id',
+        string $fields = '*',
+        array $links = [],
+    ): array|bool {
         $storages = new Storages();
-        return $storages->get($value, $key_field, $fields, $links);
+        return $storages->get($value, $keyField, $fields, $links);
     }
 
     public static function fileExists(string $file): string|false
     {
-        $file = self::getDirStorage() . $file;
+        $file = self::getUserStorage() . $file;
         return file_exists($file) ? $file : false;
     }
 
@@ -113,12 +120,12 @@ class Storage
         $i = 2;
         do {
             $i++;
-            $name = Helpers::generateSymbols($i);
-        } while (self::getStorage($name, 'name')); // Всегда задавался вопросом, где можно найти приминение do while
+            $name = Texts::generateSymbols($i);
+        } while (self::getStorage($name, 'name'));
         return $name;
     }
 
-    public static function formatByte(int $bytes): string // Создано Chat-GPT (Я бы не додумался)
+    public static function formatByte(int $bytes): string
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
@@ -131,13 +138,13 @@ class Storage
         return round($bytes, 2) . ' ' . $units[$pow];
     }
 
-    public static function get_filename(string $file): string
+    public static function getFilename(string $file): string
     {
         $info = pathinfo($file);
         $filename = $info['filename'];
         $extension = isset($info['extension']) ? '.' . $info['extension'] : '';
 
-        $storage = self::getDirStorage();
+        $storage = self::getUserStorage();
         $postfix = '';
 
         $i = 0;
@@ -145,14 +152,14 @@ class Storage
             $i++;
             $name = $filename . $postfix . $extension;
             $postfix = '_' . $i;
-        } while (file_exists($storage . $name)); // Как я запомнил do while? Вначале сделать, потом проверить
+        } while (file_exists($storage . $name));
 
         return $name;
     }
 
     public static function upload(array $file, string $name): void
     {
-        $storage = self::getDirStorage();
+        $storage = self::getUserStorage();
         if (!file_exists($storage)) {
             mkdir($storage, 0, true);
         }
@@ -169,7 +176,7 @@ class Storage
 
     public static function download(int $id, string $file): void
     {
-        $file = self::getDirStorage($id) . $file;
+        $file = self::getUserStorage($id) . $file;
         if (!file_exists($file)) {
             Response::redirect('/');
             return;

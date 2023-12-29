@@ -2,10 +2,8 @@
 
 namespace Storage\Storage\Application\Forms;
 
-use Storage\Storage\Core\Form;
-
+use Storage\Storage\Core\{Form, Response};
 use Storage\Storage\Application\Models\Users;
-use Storage\Storage\Core\Response;
 
 class Login extends Form
 {
@@ -18,7 +16,7 @@ class Login extends Form
         ],
     ];
 
-    public static function verify_user(array &$data): int|false
+    public static function verifyUser(array &$data): int|false
     {
         $errors = [];
         $users = new Users();

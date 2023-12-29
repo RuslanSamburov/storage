@@ -1,6 +1,6 @@
 <?php
 
-use Storage\Storage\Core\Helpers;
+use Storage\Storage\Core\{Texts, Shows};
 
 ?>
 <!DOCTYPE html>
@@ -9,7 +9,7 @@ use Storage\Storage\Core\Helpers;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php require_once Helpers::get_fragment_path('css'); ?>
+    <?php require_once Texts::getFragmentPath('css'); ?>
     <title>Storage</title>
 </head>
 
@@ -17,7 +17,7 @@ use Storage\Storage\Core\Helpers;
     <div id="root">
         <div class="App">
             <div class="main">
-                <?php require_once Helpers::get_fragment_path('navigationBar'); ?>
+                <?php require_once Texts::getFragmentPath('navigationBar'); ?>
                 <div class="content">
                     <h1>Сменить пароль</h1>
                     <form class="passwordForm" method="post">
@@ -25,19 +25,19 @@ use Storage\Storage\Core\Helpers;
                         <div class="mb-3">
                             <label class="form-label" for="formBasicOldPassword">Текущий пароль</label>
                             <input type="password" id="formBasicOldPassword" class="form-control" name="old_password" value="<?= $form['old_password']; ?>">
-                            <?php Helpers::show_errors('old_password', $form); ?>
+                            <?php Shows::showErrors('old_password', $form); ?>
                         </div>
                         <div class="mb-3">
                             <label class="form-label" for="formBasicNewPassword">Новый пароль</label>
                             <input type="password" id="formBasicNewPassword" class="form-control" name="password" value="<?= $form['password']; ?>">
-                            <?php Helpers::show_errors('password', $form); ?>
+                            <?php Shows::showErrors('password', $form); ?>
                         </div>
                         <div class="mb-3">
                             <label class="form-label" for="formBasicRepeatNewPassword">Повторите пароль</label>
                             <input type="password" id="formBasicRepeatNewPassword" class="form-control" name="password2" value="<?= $form['password2']; ?>">
-                            <?php Helpers::show_errors('password2', $form); ?>
+                            <?php Shows::showErrors('password2', $form); ?>
                         </div>
-                        <?php Helpers::show_results('message', $form); ?>
+                        <?php Shows::showResults('message', $form); ?>
                         <button class="btn btn-primary">Сменить пароль</button>
                     </form>
                 </div>

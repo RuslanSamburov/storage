@@ -1,6 +1,6 @@
 <?php
 
-use Storage\Storage\Core\Helpers;
+use Storage\Storage\Core\{Shows, Texts};
 
 ?>
 
@@ -10,7 +10,7 @@ use Storage\Storage\Core\Helpers;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php require_once Helpers::get_fragment_path('css'); ?>
+    <?php require_once Texts::getFragmentPath('css'); ?>
     <link rel="stylesheet" href="css/login.css">
     <title>Авторизация</title>
 </head>
@@ -27,14 +27,14 @@ use Storage\Storage\Core\Helpers;
                     <div>
                         <input id="inputEmail" type="email" class="form-control" name="email" value="<?= $form['email']; ?>">
                     </div>
-                    <?php Helpers::show_errors('email', $form); ?>
+                    <?php Shows::showErrors('email', $form); ?>
                 </div>
                 <div>
                     <label for="inputPassword" class="col-form-label">Пароль</label>
                     <div>
                         <input id="inputPassword" type="password" class="form-control" name="password" value="<?= $form['password']; ?>">
                     </div>
-                    <?php Helpers::show_errors('password', $form); ?>
+                    <?php Shows::showErrors('password', $form); ?>
                 </div>
                 <div class="my-3">
                     <a href="/register">Регистрация</a>
