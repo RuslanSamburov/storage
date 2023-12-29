@@ -1,0 +1,29 @@
+<?php
+
+namespace Storage\Storage\Application\Forms;
+
+use Storage\Storage\Application\Models\Storages;
+use Storage\Storage\Core\Storage;
+use Storage\Storage\Core\Form;
+
+class DeleteFile extends Form
+{
+    protected const FIELDS = [
+        'filename' => [
+            'type' => 'string',
+        ],
+    ];
+
+    protected static function after_normalize_data(array &$data, array &$errors, &$results): void
+    {
+        $storage = Storage::getStorage($data['filename'], 'name');
+        $file = Storage::fileExists($storage['file']);
+        if (!$file) {
+            $errors['filename'] = 'Файл не найден';
+            if ($storage) {
+                $storages = new Storages();
+                $storages->delete($storage['id']);
+            }
+        }
+    }
+}
