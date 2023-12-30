@@ -1,0 +1,9 @@
+.App {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+form > div:first-child {
+    text-align: center;
+}
