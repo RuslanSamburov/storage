@@ -1,0 +1,19 @@
+{
+    "name": "solmer/storage",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Solmer\\Storage\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Ruslan Samburov",
+            "email": "samburov.com@gmail.com"
+        }
+    ],
+    "require": {
+        "phpmailer/phpmailer": "^6.9",
+        "vlucas/phpdotenv": "^5.6"
+    }
+}

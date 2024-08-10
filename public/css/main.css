@@ -1,0 +1,44 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+}
+
+#root,
+.App {
+    width: 100%;
+    height: 100%;
+}
+
+form {
+    width: 450px;
+}
+
+.result-box-error {
+    --result-box-error: rgb(220, 53, 69);
+    --result-box-line-width: 5px;
+    --result-box-line-style: solid;
+    --result-box-color: #f1aeb5;
+    --result-box-radius: 10px;
+    --result-box-color-text: white;
+}
+
+.result-box-result {
+    --result-box-error: rgb(0, 184, 0);
+    --result-box-line-width: 5px;
+    --result-box-line-style: solid;
+    --result-box-color: #6dff60;
+    --result-box-radius: 10px;
+    --result-box-color-text: white;
+}
+
+.result-box {
+    padding: 10px;
+    background-color: var(--result-box-error);
+    border: var(--result-box-line-width) var(--result-box-line-style) var(--result-box-color);
+    border-radius: var(--result-box-radius);
+    color: var(--result-box-color-text);
+}
